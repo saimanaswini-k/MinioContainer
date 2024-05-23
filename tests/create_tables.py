@@ -178,7 +178,7 @@ def create_tables(config):
         )
 
         cur = conn.cursor()
-
+    try : 
         cur.execute(datasets)
         cur.execute(connector_registry)
         cur.execute(connector_instances)
@@ -188,15 +188,11 @@ def create_tables(config):
         cur.execute(ins_ci, (json.dumps(enc_config),))
 
         conn.commit()
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        conn.rollback()
+    finally:
         conn.close()
+        minio_container.stop()
 
-    
-    # clean up
-    def remove_minio_container():
-        minio.stop()
-        try:
-            os.remove(os.path.join(os.path.dirname(__file__), "config/config.yaml"))
-        except FileNotFoundError:
-            print("config file already removed")
-
-    return remove_minio_container
+    return
