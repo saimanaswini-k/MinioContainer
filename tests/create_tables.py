@@ -7,10 +7,6 @@ from testcontainers.minio import MinioContainer
 from minio import Minio
 from minio.error import S3Error
 
-
-minio_container= MinioContainer("minio/minio:latest")
-minio_container.start()
-
 def init_minio(connector_config):
 
     config=json.loads(connector_config)
@@ -55,7 +51,9 @@ def init_minio(connector_config):
 
 def create_tables(config):
     enc = EncryptionUtil(config["obsrv_encryption_key"])
-   
+    minio_container= MinioContainer("minio/minio:latest")
+    minio_container.start()
+    
     connector_config = json.dumps({
             "source": {
                 "type": "s3",
